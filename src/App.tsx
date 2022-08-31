@@ -9,7 +9,7 @@ const App: VFC = () => {
         <Home />
       </div>
       <footer id='footer-style'>
-        <p id="copy-right">🄫2022年 buntyo</p>
+        <p id="copy-right">🄫2022年 aokuma</p>
       </footer>
     </div>
   );

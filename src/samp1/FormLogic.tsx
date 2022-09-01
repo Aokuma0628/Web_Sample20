@@ -43,7 +43,6 @@ const getFieldName = (input: InputValue): string => {
 
 const showError = (input: InputValue, message: string): void => {
   input.setType(INPUT_TYPE.ERROR);
-  console.log(input.value, message);
   input.setErrMsg(message);
 };
 
@@ -59,8 +58,6 @@ const showNormal = (input: InputValue): void => {
 
 const checkRequired = (inputArr: InputValue[]): boolean => {
   let isRequired = false;
-
-  console.log(inputArr);
 
   inputArr.forEach((input) => {
     if (input.value.trim() === '') {

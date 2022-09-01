@@ -2,19 +2,25 @@ import React, { FC, useState, useRef } from 'react';
 import Form from './Form';
 
 export type InputValue = {
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    className: string;
-    setClassName: React.Dispatch<React.SetStateAction<string>>;
-    errMsg: string;
-    setErrMsg: React.Dispatch<React.SetStateAction<string>>;
-    ref: React.RefObject<HTMLInputElement>
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  type: INPUT_TYPE;
+  setType: React.Dispatch<React.SetStateAction<INPUT_TYPE>>;
+  errMsg: string;
+  setErrMsg: React.Dispatch<React.SetStateAction<string>>;
+  ref: React.RefObject<HTMLInputElement>
 };
 
+export enum INPUT_TYPE {
+  NORMAL = 0,
+  ERROR,
+  SUCCESS,
+}
 
-const useInput = (initValue: string, initClass: string, initMsg: string): InputValue => {
+
+const useInput = (initValue: string, initMsg: string): InputValue => {
   const[value, setValue]         = useState(initValue);
-  const[className, setClassName] = useState(initClass);
+  const[type, setType]           = useState(INPUT_TYPE.NORMAL);
   const[errMsg, setErrMsg]       = useState(initMsg);
 
   const ref = useRef<HTMLInputElement>(null);
@@ -22,35 +28,39 @@ const useInput = (initValue: string, initClass: string, initMsg: string): InputV
   return ({
     value,
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value),
-    className,
-    setClassName,
+    type,
+    setType,
     errMsg,
     setErrMsg,
     ref,
   });
 };
 
+const getFieldName = (input: InputValue): string => {
+  const element = input.ref.current;
+  return element ? element.id : '';
+};
+
 const showError = (input: InputValue, message: string): void => {
-  input.setClassName('form-control error');
+  input.setType(INPUT_TYPE.ERROR);
+  console.log(input.value, message);
   input.setErrMsg(message);
 };
 
 const showSuccess = (input: InputValue): void => {
-  input.setClassName('form-control success');
+  input.setType(INPUT_TYPE.SUCCESS);
+  input.setErrMsg('');
 };
 
 const showNormal = (input: InputValue): void => {
-  input.setClassName('form-control');
-};
-
-const getFieldName = (input: InputValue): string => {
-  const element = input.ref.current;
-
-  return element ? element.id : '';
+  input.setType(INPUT_TYPE.NORMAL);
+  input.setErrMsg('');
 };
 
 const checkRequired = (inputArr: InputValue[]): boolean => {
   let isRequired = false;
+
+  console.log(inputArr);
 
   inputArr.forEach((input) => {
     if (input.value.trim() === '') {
@@ -88,7 +98,8 @@ const checkEmail = (input: InputValue):void => {
   const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   if (re.test(input.value.trim())) {
     showSuccess(input);
-  } else {
+  } 
+  else {
     showError(input, 'Email is not valid');
   }
 };
@@ -97,14 +108,17 @@ const checkPasswordsMatch = (input1: InputValue, input2: InputValue):void => {
   if (input1.value !== input2.value) {
     showError(input2, 'Passwords do not match');
   }
+  else {
+    showSuccess(input2);
+  }
 };
 
 // Container
 const FormLogic: FC = () => {
-  const name    = useInput('', 'form-control', 'Error message');
-  const email   = useInput('', 'form-control', 'Error message');
-  const passwd  = useInput('', 'form-control', 'Error message');
-  const passwd2 = useInput('', 'form-control', 'Error message');
+  const name    = useInput('', '');
+  const email   = useInput('', '');
+  const passwd  = useInput('', '');
+  const passwd2 = useInput('', '');
 
   const SubmitFunc = (e: React.FormEvent) => {
     if (e) e.preventDefault();
